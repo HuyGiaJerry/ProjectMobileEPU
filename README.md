@@ -10,5 +10,5 @@ Foodepi là ứng dụng di động hỗ trợ người dùng tìm kiếm, lựa
 - Xem danh sách món ăn
 - Thanh toán
 # Phân công (chia page)
-Hiếu :  login , cart , payment method , profile 
-Huy  :  sign up , welcome , home , detail 
+- Hiếu :  login , cart , payment method , profile 
+- Huy  :  sign up , welcome , home , detail 
