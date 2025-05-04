@@ -6,7 +6,7 @@ import HomeScreen from "./screens/Home";
 import LoginScreen from "./screens/Login";
 import { ThemeProvider } from "./context/ThemeContext";
 import Authencation from "./screens/Auth";
-
+import ProfileScreen from "./screens/Profile";
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +18,7 @@ export default function App() {
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Auth" component={Authencation}/>
+          <Stack.Screen name="Profile" component={ProfileScreen}/>
         </Stack.Navigator>
       </NavigationContainer>
     </ThemeProvider>
