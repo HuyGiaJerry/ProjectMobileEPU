@@ -18,9 +18,14 @@ export default function App() {
         <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
+<<<<<<< HEAD
           <Stack.Screen name="Auth" component={Authencation}/>
           <Stack.Screen name="Profile" component={ProfileScreen}/>
           <Stack.Screen name="Cart" component={CartScreen}/>
+=======
+          <Stack.Screen name="Auth" component={Authencation} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
+>>>>>>> 33e35ac2ee497953c8582930a23dc249086f1bb0
         </Stack.Navigator>
       </NavigationContainer>
     </ThemeProvider>
