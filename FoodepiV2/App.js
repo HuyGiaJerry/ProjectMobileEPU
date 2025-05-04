@@ -14,10 +14,10 @@ export default function App() {
   return (
     <ThemeProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+        <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Auth" component={Authencation}/>
+          <Stack.Screen name="Auth" component={Authencation} />
         </Stack.Navigator>
       </NavigationContainer>
     </ThemeProvider>
