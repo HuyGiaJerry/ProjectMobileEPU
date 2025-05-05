@@ -10,7 +10,7 @@ import {
   TextInput,
 } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
-import { useCart } from '../context/CartContext'; // Sửa lỗi: CardContext -> CartContext
+import { useCart } from '../context/CartContext';
 import Icon from 'react-native-vector-icons/Feather';
 import ButtonGoBack from '../components/GoBack';
 
@@ -18,14 +18,14 @@ const { width } = Dimensions.get('window');
 
 export default function CartScreen({ navigation }) {
   const { theme } = useTheme();
-  const { cart, setCart } = useCart(); // Sử dụng cart và setCart từ CartContext
+  const { cart, setCart } = useCart();
 
   // Tăng/giảm số lượng
   const updateQty = (id, delta) => {
     setCart((prev) =>
       prev
         .map((item) =>
-          item.id === id ? { ...item, qty: Math.max(1, item.qty + delta) } : item
+          item.id === id ? { ...item, qty: item.qty + delta } : item
         )
         .filter((item) => item.qty > 0)
     );
@@ -33,7 +33,7 @@ export default function CartScreen({ navigation }) {
 
   // Xử lý nhập số lượng
   const handleQtyInput = (id, text) => {
-    if (/^\d*$/.test(text)) { // Chỉ cho phép số
+    if (/^\d*$/.test(text)) {
       setCart((prev) =>
         prev.map((item) =>
           item.id === id ? { ...item, qty: text } : item
@@ -62,7 +62,7 @@ export default function CartScreen({ navigation }) {
   const discount = 0;
   const total = orderAmount + tax - discount;
 
-  // Styles (giữ nguyên như mã gốc của bạn)
+  // Styles
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -241,6 +241,7 @@ export default function CartScreen({ navigation }) {
             <View style={styles.itemInfo}>
               <Text style={styles.itemName}>{item.name}</Text>
               <Text style={styles.itemDesc}>{item.desc || 'Không có mô tả'}</Text>
+              <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
               <Text style={styles.itemPrice}>${item.price}</Text>
               <View style={styles.itemQtyBox}>
                 <TouchableOpacity style={styles.qtyBtn} onPress={() => updateQty(item.id, -1)}>
@@ -256,6 +257,7 @@ export default function CartScreen({ navigation }) {
                 <TouchableOpacity style={styles.qtyBtn} onPress={() => updateQty(item.id, 1)}>
                   <Icon name="plus" size={18} color="rgba(254, 85, 42, 1)" />
                 </TouchableOpacity>
+              </View>
               </View>
             </View>
           </View>

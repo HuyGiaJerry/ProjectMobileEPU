@@ -11,8 +11,7 @@ import {
 } from 'react-native';
 import ButtonGoBack from '../components/GoBack';
 import { useTheme } from '../context/ThemeContext';
-import { useCart } from '../context/CartContext'; // Sửa lỗi: CardContext -> CartContext
-
+import { useCart } from '../context/CartContext';
 const ShopDetail = ({ route }) => {
   const { theme } = useTheme();
   const { shopId } = route.params;

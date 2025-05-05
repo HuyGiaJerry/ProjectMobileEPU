@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, TextInput, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -12,13 +12,51 @@ const ProfileScreen = ({ route }) => {
   const { user } = route.params || {};
   const { theme } = useTheme();
 
-  // Xử lý trường hợp user không có các trường cần thiết
-  const displayName = (user?.firstname || '') + ' ' + (user?.lastname || '') || 'New User';
-  const firstName = user?.firstname || 'New';
-  const lastName = user?.lastname || 'User';
-  const phoneNumber = user?.phone || 'N/A';
-  const email = user?.email || 'email@example.com';
+  // State for editable fields
+  const [firstName, setFirstName] = useState(user?.firstname || 'New');
+  const [lastName, setLastName] = useState(user?.lastname || 'User');
+  const [email, setEmail] = useState(user?.email || 'email@example.com');
+  const [phoneNumber, setPhoneNumber] = useState(user?.phone || 'N/A');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const displayName = `${firstName} ${lastName}`.trim() || 'New User';
   const avatar = user?.avatar || 'https://i.pravatar.cc/150';
+
+  // Function to handle PUT request
+  const updateUserProfile = async () => {
+    if (!user?.id) {
+      Alert.alert('Error', 'User ID is missing.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`https://681829955a4b07b9d1ce1539.mockapi.io/User/${user.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstname: firstName,
+          lastname: lastName,
+          email,
+          phone: phoneNumber,
+          avatar,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      const updatedUser = await response.json();
+      Alert.alert('Success', 'Profile updated successfully!');
+    } catch (error) {
+      Alert.alert('Error', `Failed to update profile: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -89,23 +127,26 @@ const ProfileScreen = ({ route }) => {
       elevation: 1,
       height: height * 0.11,
     },
+    cardLabel: {
+      color: theme.subText || '#bbb',
+      fontSize: 13,
+      marginBottom: 4,
+    },
     cardRow: {
       flexDirection: 'row',
       alignItems: 'center',
+      justifyContent: 'space-between',
     },
     cardContent: {
       flex: 1,
       marginLeft: 12,
-      paddingVertical: 10,
     },
-    cardLabel: {
-      color: theme.subText || '#bbb',
-      fontSize: 13,
-    },
-    cardValue: {
+    input: {
       color: theme.text,
       fontWeight: 'bold',
       fontSize: 15,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.subText || '#bbb',
     },
     socialTitle: {
       fontSize: 16,
@@ -138,6 +179,19 @@ const ProfileScreen = ({ route }) => {
       fontWeight: 'bold',
       marginRight: 8,
     },
+    saveButton: {
+      backgroundColor: '#FF6B6B',
+      borderRadius: 8,
+      padding: 12,
+      alignItems: 'center',
+      marginTop: 16,
+      marginBottom: 20,
+    },
+    saveButtonText: {
+      color: '#fff',
+      fontWeight: 'bold',
+      fontSize: 16,
+    },
   });
 
   return (
@@ -151,10 +205,7 @@ const ProfileScreen = ({ route }) => {
 
       {/* Avatar & Info */}
       <View style={styles.profileInfo}>
-        <Image
-          source={{ uri: avatar }}
-          style={styles.avatar}
-        />
+        <Image source={{ uri: avatar }} style={styles.avatar} />
         <View style={styles.divider} />
         <View style={styles.joinedBox}>
           <Text style={styles.joinedText}>Joined</Text>
@@ -164,13 +215,22 @@ const ProfileScreen = ({ route }) => {
       <Text style={styles.name}>{firstName}</Text>
       <Text style={styles.lastname}>{lastName}</Text>
 
-      {/* Info Cards */}
+      {/* Editable Info Cards */}
       <View style={styles.card}>
+        <Text style={styles.cardLabel}>Name</Text>
         <View style={styles.cardRow}>
           <Icon name="user" size={20} color="#333" />
           <View style={styles.cardContent}>
-            <Text style={styles.cardLabel}>Name</Text>
-            <Text style={styles.cardValue}>{displayName}</Text>
+            <TextInput
+              style={styles.input}
+              value={displayName}
+              onChangeText={(text) => {
+                const [newFirst, newLast] = text.split(' ');
+                setFirstName(newFirst || '');
+                setLastName(newLast || '');
+              }}
+              placeholder="Enter full name"
+            />
           </View>
           <TouchableOpacity>
             <Image source={require('../assets/edit.png')} style={{ width: 24, height: 24 }} />
@@ -178,11 +238,17 @@ const ProfileScreen = ({ route }) => {
         </View>
       </View>
       <View style={styles.card}>
+        <Text style={styles.cardLabel}>Email</Text>
         <View style={styles.cardRow}>
           <MaterialIcon name="email" size={20} color="#333" />
           <View style={styles.cardContent}>
-            <Text style={styles.cardLabel}>Email</Text>
-            <Text style={styles.cardValue}>{email}</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Enter email"
+              keyboardType="email-address"
+            />
           </View>
           <TouchableOpacity>
             <Image source={require('../assets/edit.png')} style={{ width: 24, height: 24 }} />
@@ -190,12 +256,18 @@ const ProfileScreen = ({ route }) => {
         </View>
       </View>
       <View style={styles.card}>
+        <Text style={styles.cardLabel}>Mobile Number</Text>
         <View style={styles.cardRow}>
           <Icon name="phone" size={20} color="#333" />
           <View style={styles.cardContent}>
-            <Text style={styles.cardLabel}>Mobile Number</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={styles.cardValue}>{phoneNumber}</Text>
+              <TextInput
+                style={[styles.input, { flex: 1 }]}
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                placeholder="Enter phone number"
+                keyboardType="phone-pad"
+              />
               <Image source={require('../assets/check.png')} style={{ width: 18, height: 18, marginLeft: 10 }} />
             </View>
           </View>
@@ -204,6 +276,11 @@ const ProfileScreen = ({ route }) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Save Button */}
+      <TouchableOpacity style={styles.saveButton} onPress={updateUserProfile} disabled={isLoading}>
+        <Text style={styles.saveButtonText}>{isLoading ? 'Saving...' : 'Save Changes'}</Text>
+      </TouchableOpacity>
 
       {/* Social Accounts */}
       <Text style={styles.socialTitle}>Social Accounts</Text>
