@@ -1,77 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, TextInput } from 'react-native';
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+  TextInput,
+} from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+import { useCart } from '../context/CartContext'; // Sửa lỗi: CardContext -> CartContext
 import Icon from 'react-native-vector-icons/Feather';
 import ButtonGoBack from '../components/GoBack';
-import { useRoute } from '@react-navigation/native'; // Thêm useRoute để nhận params
 
 const { width } = Dimensions.get('window');
 
 export default function CartScreen({ navigation }) {
   const { theme } = useTheme();
-  const route = useRoute();
-  const [cart, setCart] = useState([]);
-
-  // Nhận sản phẩm từ Detail Screen qua route.params
-  useEffect(() => {
-    if (route.params?.newItem) {
-      const newItem = route.params.newItem;
-      setCart(prev => {
-        // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa
-        const existingItem = prev.find(item => item.id === newItem.id);
-        if (existingItem) {
-          // Nếu đã có, tăng số lượng
-          return prev.map(item =>
-            item.id === newItem.id ? { ...item, qty: item.qty + 1 } : item
-          );
-        } else {
-          // Nếu chưa có, thêm mới
-          return [...prev, { ...newItem, qty: 1 }];
-        }
-      });
-    }
-  }, [route.params?.newItem]);
+  const { cart, setCart } = useCart(); // Sử dụng cart và setCart từ CartContext
 
   // Tăng/giảm số lượng
   const updateQty = (id, delta) => {
-    setCart(prev =>
+    setCart((prev) =>
       prev
-        .map(item =>
-          item.id === id ? { ...item, qty: item.qty + delta } : item
+        .map((item) =>
+          item.id === id ? { ...item, qty: Math.max(1, item.qty + delta) } : item
         )
-        .filter(item => item.qty > 0)
+        .filter((item) => item.qty > 0)
     );
   };
-
-  // Tính tổng tiền
-  const orderAmount = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const tax = 3;
-  const discount = 0;
-  const total = orderAmount + tax - discount;
 
   // Xử lý nhập số lượng
   const handleQtyInput = (id, text) => {
-    setCart(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, qty: text } : item
-      )
-    );
+    if (/^\d*$/.test(text)) { // Chỉ cho phép số
+      setCart((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, qty: text } : item
+        )
+      );
+    }
   };
 
+  // Xử lý khi input mất focus để xác thực số lượng
   const handleQtyBlur = (id, text) => {
     let num = parseInt(text, 10);
     if (isNaN(num) || num < 1) {
-      setCart(prev => prev.filter(item => item.id !== id));
+      setCart((prev) => prev.filter((item) => item.id !== id));
     } else {
-      setCart(prev =>
-        prev.map(item =>
+      setCart((prev) =>
+        prev.map((item) =>
           item.id === id ? { ...item, qty: num } : item
         )
       );
     }
   };
 
-  // Styles giữ nguyên như code gốc của bạn
+  // Tính tổng
+  const orderAmount = cart.reduce((sum, item) => sum + item.price * (item.qty || 1), 0);
+  const tax = 3;
+  const discount = 0;
+  const total = orderAmount + tax - discount;
+
+  // Styles (giữ nguyên như mã gốc của bạn)
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -234,22 +225,22 @@ export default function CartScreen({ navigation }) {
     <View style={styles.container}>
       <View style={styles.header}>
         <ButtonGoBack />
-        <Text style={styles.headerText}>Cart</Text>
+        <Text style={styles.headerText}>Giỏ hàng</Text>
         <View style={{ width: 32 }} />
       </View>
       <Text style={{ color: theme.text, fontWeight: 'bold', fontSize: 16, marginBottom: 10 }}>
-        {cart.length} Items
+        {cart.length} Món
       </Text>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {cart.map(item => (
+        {cart.map((item) => (
           <View style={styles.cartItem} key={item.id}>
             <Image
-              source={{ uri: item.image || 'https://via.placeholder.com/150' }} // Sử dụng uri từ API
+              source={{ uri: item.image || 'https://via.placeholder.com/150' }}
               style={styles.itemImg}
             />
             <View style={styles.itemInfo}>
               <Text style={styles.itemName}>{item.name}</Text>
-              <Text style={styles.itemDesc}>{item.desc || 'No description'}</Text>
+              <Text style={styles.itemDesc}>{item.desc || 'Không có mô tả'}</Text>
               <Text style={styles.itemPrice}>${item.price}</Text>
               <View style={styles.itemQtyBox}>
                 <TouchableOpacity style={styles.qtyBtn} onPress={() => updateQty(item.id, -1)}>
@@ -259,7 +250,7 @@ export default function CartScreen({ navigation }) {
                   style={styles.qtyInput}
                   value={item.qty === undefined ? '' : item.qty.toString()}
                   keyboardType="number-pad"
-                  onChangeText={text => handleQtyInput(item.id, text)}
+                  onChangeText={(text) => handleQtyInput(item.id, text)}
                   onBlur={() => handleQtyBlur(item.id, item.qty)}
                 />
                 <TouchableOpacity style={styles.qtyBtn} onPress={() => updateQty(item.id, 1)}>
@@ -271,26 +262,27 @@ export default function CartScreen({ navigation }) {
         ))}
         <View style={styles.summary}>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Order Amount</Text>
-            <Text style={styles.summaryValue}>${orderAmount}</Text>
+            <Text style={styles.summaryLabel}>Tổng đơn hàng</Text>
+            <Text style={styles.summaryValue}>${orderAmount.toFixed(2)}</Text>
           </View>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Tax</Text>
-            <Text style={styles.summaryValue}>${tax}</Text>
+            <Text style={styles.summaryLabel}>Thuế</Text>
+            <Text style={styles.summaryValue}>${tax.toFixed(2)}</Text>
           </View>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Discount</Text>
-            <Text style={styles.summaryValue}>${discount}</Text>
+            <Text style={styles.summaryLabel}>Giảm giá</Text>
+            <Text style={styles.summaryValue}>${discount.toFixed(2)}</Text>
           </View>
           <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Total</Text>
-            <Text style={styles.totalValue}>${total}</Text>
+            <Text style={styles.totalLabel}>Tổng cộng</Text>
+            <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.checkoutBtn}
+        <TouchableOpacity
+          style={styles.checkoutBtn}
           onPress={() => navigation.navigate('Payment', { total })}
         >
-          <Text style={styles.checkoutText}>Checkout</Text>
+          <Text style={styles.checkoutText}>Thanh toán</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>

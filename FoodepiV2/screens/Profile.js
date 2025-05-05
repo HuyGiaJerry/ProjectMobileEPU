@@ -14,6 +14,8 @@ const ProfileScreen = ({ route }) => {
 
   // Xử lý trường hợp user không có các trường cần thiết
   const displayName = (user?.firstname || '') + ' ' + (user?.lastname || '') || 'New User';
+  const firstName = user?.firstname || 'New';
+  const lastName = user?.lastname || 'User';
   const phoneNumber = user?.phone || 'N/A';
   const email = user?.email || 'email@example.com';
   const avatar = user?.avatar || 'https://i.pravatar.cc/150';
@@ -43,8 +45,8 @@ const ProfileScreen = ({ route }) => {
       marginBottom: 8,
     },
     avatar: {
-      width: width * 0.18,
-      height: width * 0.18,
+      width: width * 0.15,
+      height: width * 0.15,
       borderRadius: (width * 0.18) / 2,
       borderWidth: 3,
       borderColor: '#FF6B6B',
@@ -80,7 +82,7 @@ const ProfileScreen = ({ route }) => {
       marginBottom: 16,
     },
     card: {
-      backgroundColor: theme.card || '#fafafa',
+      backgroundColor: theme.background1 || '#fafafa',
       borderRadius: 16,
       padding: 12,
       marginBottom: 10,
@@ -115,7 +117,7 @@ const ProfileScreen = ({ route }) => {
     socialCard: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: theme.card || '#fafafa',
+      backgroundColor: theme.background1 || '#fafafa',
       borderRadius: 16,
       paddingVertical: 30,
       paddingHorizontal: 12,
@@ -159,8 +161,8 @@ const ProfileScreen = ({ route }) => {
           <Text style={styles.joinedTime}>9 mon ago</Text>
         </View>
       </View>
-      <Text style={styles.name}>{displayName}</Text>
-      <Text style={styles.lastname}>User</Text>
+      <Text style={styles.name}>{firstName}</Text>
+      <Text style={styles.lastname}>{lastName}</Text>
 
       {/* Info Cards */}
       <View style={styles.card}>
