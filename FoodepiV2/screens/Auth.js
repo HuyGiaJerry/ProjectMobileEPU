@@ -61,7 +61,7 @@ export default function AuthScreen({ route }) {
       alert('Vui lòng nhập mã OTP 4 chữ số hợp lệ.');
       return;
     }
-  
+
     try {
       // Kiểm tra người dùng hiện có
       console.log('Fetching user with phone:', phoneNumber);
@@ -69,7 +69,7 @@ export default function AuthScreen({ route }) {
       console.log('GET Response Status:', res.status);
       const users = await res.json();
       console.log('Fetched users:', users);
-  
+
       let user;
       if (Array.isArray(users) && users.length > 0) {
         user = users[0];
@@ -97,6 +97,8 @@ export default function AuthScreen({ route }) {
         user = await createRes.json();
         console.log('Created user:', user);
       }
+      // 📝 Store User ID
+      // await AsyncStorage.setItem('userId', user.id);
       navigation.navigate('App', { user });
     } catch (err) {
       console.error('Lỗi đăng nhập:', err);
@@ -146,7 +148,7 @@ export default function AuthScreen({ route }) {
   );
 }
 
-// Styles giữ nguyên
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

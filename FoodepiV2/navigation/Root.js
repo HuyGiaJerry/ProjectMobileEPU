@@ -10,7 +10,7 @@ const RootStack = createStackNavigator();
 
 export default function RootNavigator() {
   return (
-    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+    <RootStack.Navigator initialRouteName='Login' screenOptions={{ headerShown: false }}>
       <RootStack.Screen name="Login" component={LoginScreen} />
       <RootStack.Screen name="Auth" component={AuthScreen} />
       <RootStack.Screen name="App" component={AppDrawer} />

@@ -1,52 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, TextInput } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import Icon from 'react-native-vector-icons/Feather';
 import ButtonGoBack from '../components/GoBack';
+import { useRoute } from '@react-navigation/native'; // Thêm useRoute để nhận params
 
 const { width } = Dimensions.get('window');
 
-const initialCart = [
-  {
-    id: 1,
-    name: 'Meat Burger',
-    desc: 'Chicken with butter nun',
-    price: 19,
-    qty: 1,
-    img: require('../assets/burger.png'), 
-  },
-  {
-    id: 2,
-    name: 'Meat Burger',
-    desc: 'Chicken with butter nun',
-    price: 19,
-    qty: 1,
-    img: require('../assets/burger.png'),
-  },
-  {
-    id: 3,
-    name: 'Meat Burger',
-    desc: 'Chicken with butter nun',
-    price: 39,
-    qty: 4,
-    img: require('../assets/burger.png'),
-  },
-];
-
-export default function CartScreen() {
+export default function CartScreen({ navigation }) {
   const { theme } = useTheme();
-  const [cart, setCart] = useState(initialCart);
+  const route = useRoute();
+  const [cart, setCart] = useState([]);
+
+  // Nhận sản phẩm từ Detail Screen qua route.params
+  useEffect(() => {
+    if (route.params?.newItem) {
+      const newItem = route.params.newItem;
+      setCart(prev => {
+        // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa
+        const existingItem = prev.find(item => item.id === newItem.id);
+        if (existingItem) {
+          // Nếu đã có, tăng số lượng
+          return prev.map(item =>
+            item.id === newItem.id ? { ...item, qty: item.qty + 1 } : item
+          );
+        } else {
+          // Nếu chưa có, thêm mới
+          return [...prev, { ...newItem, qty: 1 }];
+        }
+      });
+    }
+  }, [route.params?.newItem]);
 
   // Tăng/giảm số lượng
   const updateQty = (id, delta) => {
     setCart(prev =>
       prev
         .map(item =>
-          item.id === id
-            ? { ...item, qty: item.qty + delta }
-            : item
+          item.id === id ? { ...item, qty: item.qty + delta } : item
         )
-        .filter(item => item.qty > 0) 
+        .filter(item => item.qty > 0)
     );
   };
 
@@ -56,6 +49,29 @@ export default function CartScreen() {
   const discount = 0;
   const total = orderAmount + tax - discount;
 
+  // Xử lý nhập số lượng
+  const handleQtyInput = (id, text) => {
+    setCart(prev =>
+      prev.map(item =>
+        item.id === id ? { ...item, qty: text } : item
+      )
+    );
+  };
+
+  const handleQtyBlur = (id, text) => {
+    let num = parseInt(text, 10);
+    if (isNaN(num) || num < 1) {
+      setCart(prev => prev.filter(item => item.id !== id));
+    } else {
+      setCart(prev =>
+        prev.map(item =>
+          item.id === id ? { ...item, qty: num } : item
+        )
+      );
+    }
+  };
+
+  // Styles giữ nguyên như code gốc của bạn
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -214,30 +230,6 @@ export default function CartScreen() {
     },
   });
 
-  const handleQtyInput = (id, text) => {
-    // Cho phép rỗng để user xóa số
-    setCart(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, qty: text } : item
-      )
-    );
-  };
-
-  const handleQtyBlur = (id, text) => {
-    let num = parseInt(text, 10);
-    if (isNaN(num) || num < 1) {
-      // Xóa sản phẩm nếu rỗng hoặc nhỏ hơn 1
-      setCart(prev => prev.filter(item => item.id !== id));
-    } else {
-      // Cập nhật lại số lượng hợp lệ
-      setCart(prev =>
-        prev.map(item =>
-          item.id === id ? { ...item, qty: num } : item
-        )
-      );
-    }
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -251,10 +243,13 @@ export default function CartScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {cart.map(item => (
           <View style={styles.cartItem} key={item.id}>
-            <Image source={item.img} style={styles.itemImg} />
+            <Image
+              source={{ uri: item.image || 'https://via.placeholder.com/150' }} // Sử dụng uri từ API
+              style={styles.itemImg}
+            />
             <View style={styles.itemInfo}>
               <Text style={styles.itemName}>{item.name}</Text>
-              <Text style={styles.itemDesc}>{item.desc}</Text>
+              <Text style={styles.itemDesc}>{item.desc || 'No description'}</Text>
               <Text style={styles.itemPrice}>${item.price}</Text>
               <View style={styles.itemQtyBox}>
                 <TouchableOpacity style={styles.qtyBtn} onPress={() => updateQty(item.id, -1)}>
@@ -292,7 +287,9 @@ export default function CartScreen() {
             <Text style={styles.totalValue}>${total}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.checkoutBtn}>
+        <TouchableOpacity style={styles.checkoutBtn}
+          onPress={() => navigation.navigate('Payment', { total })}
+        >
           <Text style={styles.checkoutText}>Checkout</Text>
         </TouchableOpacity>
       </ScrollView>
