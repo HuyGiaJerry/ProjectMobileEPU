@@ -6,6 +6,7 @@ import FavouritesScreen from '../screens/Favourites';
 import CartScreen from '../screens/Cart';
 import LoginScreen from '../screens/Login';
 import AuthScreen from '../screens/Auth';
+import ShopByCate from '../screens/ShopByCate';
 
 const Stack = createStackNavigator();
 
@@ -16,8 +17,7 @@ export default function MainStack() {
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="Favourites" component={FavouritesScreen} />
       <Stack.Screen name="Cart" component={CartScreen} />
-      {/* <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Auth" component={AuthScreen} /> */}
+      <Stack.Screen name="ShopByCate" component={ShopByCate} />
     </Stack.Navigator>
   );
 }

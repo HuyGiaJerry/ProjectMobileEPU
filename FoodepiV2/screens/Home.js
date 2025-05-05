@@ -1,20 +1,31 @@
-import React, { useState, useCallback, useEffect } from "react";
+
+import React, { useState, useEffect } from "react";
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, TextInput, Modal, Button, Image } from "react-native";
 import { useTheme } from '../context/ThemeContext';
 import DealCard from "../components/card/DealCard";
 import FoodCard from "../components/card/FoodCard";
 import RestaurantCard from "../components/card/RestaurantCard";
-import { deals, foodItems, restaurantItems } from "../data/shopData";
+
+import { deals, restaurantItems } from "../data/shopData";
+import axios from "axios";
 
 const HomeScreen = ({ navigation }) => {
     const { theme, toggleTheme } = useTheme();
     const [isModalVisible, setModalVisible] = useState(false);
+    const [category, setCategory] = useState([]);
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
-
-
+    useEffect(() => {
+        axios.get("https://681832515a4b07b9d1ce2efa.mockapi.io/category")
+            .then(response => {
+                setCategory(response.data);
+            })
+            .catch(error => {
+                console.error("Error fetching food items:", error);
+            });
+    }, []);
     const styles = StyleSheet.create({
         container: {
             flex: 1,
@@ -118,7 +129,6 @@ const HomeScreen = ({ navigation }) => {
             alignItems: 'center',
             borderBlockColor: 'rgb(0, 0, 0)',
             borderWidth: 1,
-
         },
         categoryTitle: {
             fontSize: 22,
@@ -139,13 +149,13 @@ const HomeScreen = ({ navigation }) => {
             resizeMode: 'contain',
         },
         largeCategoryImage: {
-            width: 180, // Kích thước lớn hơn
+            width: 180,
             height: 180,
             resizeMode: 'contain',
         },
         foodCardContainer: {
             flexDirection: 'row',
-            flexWrap: 'wrap', // Wrap to next line when full
+            flexWrap: 'wrap',
             justifyContent: 'space-between',
             marginTop: 10,
         },
@@ -195,41 +205,35 @@ const HomeScreen = ({ navigation }) => {
 
                 {/* Categories */}
                 <View style={styles.section}>
-
-                    {/* Categories */}
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Categories</Text>
-                        <View style={styles.categoriesContainer}>
-                            {/* Left Column */}
-                            <View style={styles.leftColumn}>
-                                <TouchableOpacity style={styles.categoryCard}>
-                                    <Text style={styles.categoryTitle}>Food delivery</Text>
-                                    <Text style={styles.categorySubtitle}>Best deals on your favourites!</Text>
-                                    <Image source={require('../assets/food.png')} style={styles.largeCategoryImage} />
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.categoryCard}>
-                                    <Text style={styles.categoryTitle}>Dine-in</Text>
-                                    <Text style={styles.categorySubtitle}>Exclusive offers at port</Text>
-                                    <Image source={require('../assets/dinein.png')} style={styles.categoryImage} />
-                                </TouchableOpacity>
-                            </View>
-                            {/* Right Column */}
-                            <View style={styles.rightColumn}>
-                                <TouchableOpacity style={styles.categoryCard}>
-                                    <Text style={styles.categoryTitle}>Datamart</Text>
-                                    <Text style={styles.categorySubtitle}>Grocery delivered in 30 mins!</Text>
-                                    <Image source={require('../assets/datamart.png')} style={styles.categoryImage} />
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.categoryCard}>
-                                    <Text style={styles.categoryTitle}>Shops</Text>
-                                    <Text style={styles.categorySubtitle}>Grocery and more</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.categoryCard}>
-                                    <Text style={styles.categoryTitle}>Pick-up</Text>
-                                    <Text style={styles.categorySubtitle}>Takeaway in 15 mins</Text>
-                                    <Image source={require('../assets/pickup.png')} style={styles.categoryImage} />
-                                </TouchableOpacity>
-                            </View>
+                    <Text style={styles.sectionTitle}>Categories</Text>
+                    <View style={styles.categoriesContainer}>
+                        <View style={styles.leftColumn}>
+                            <TouchableOpacity style={styles.categoryCard}>
+                                <Text style={styles.categoryTitle}>Food delivery</Text>
+                                <Text style={styles.categorySubtitle}>Best deals on your favourites!</Text>
+                                <Image source={require('../assets/food.png')} style={styles.largeCategoryImage} />
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.categoryCard}>
+                                <Text style={styles.categoryTitle}>Dine-in</Text>
+                                <Text style={styles.categorySubtitle}>Exclusive offers at port</Text>
+                                <Image source={require('../assets/dinein.png')} style={styles.categoryImage} />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.rightColumn}>
+                            <TouchableOpacity style={styles.categoryCard}>
+                                <Text style={styles.categoryTitle}>Datamart</Text>
+                                <Text style={styles.categorySubtitle}>Grocery delivered in 30 mins!</Text>
+                                <Image source={require('../assets/datamart.png')} style={styles.categoryImage} />
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.categoryCard}>
+                                <Text style={styles.categoryTitle}>Shops</Text>
+                                <Text style={styles.categorySubtitle}>Grocery and more</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.categoryCard}>
+                                <Text style={styles.categoryTitle}>Pick-up</Text>
+                                <Text style={styles.categorySubtitle}>Takeaway in 15 mins</Text>
+                                <Image source={require('../assets/pickup.png')} style={styles.categoryImage} />
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>
@@ -253,12 +257,20 @@ const HomeScreen = ({ navigation }) => {
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Chiness</Text>
                     <View style={styles.foodCardContainer}>
-                        {foodItems.map((item, index) => (
+                        {category.map((item, index) => (
                             <FoodCard
                                 key={index}
-                                title={item.title}
-                                image={item.image}
-                                onPress={() => console.log(`${item.title} pressed`)}
+                                title={item.name}
+                                image={{ uri: `https://res.cloudinary.com/dvxny7v0f/image/upload/v1746420784/${item.avatar}` }} // Sử dụng URL từ Cloudinary
+                                onPress={
+                                    () =>
+                                        navigation.navigate("ShopByCate", {
+                                            categoryId: item.id, // Truyền id của danh mục
+                                            categoryName: item.name, // Truyền tên danh mục
+                                            // categoryImage: `https://res.cloudinary.com/dvxny7v0f/image/upload/v1746420784/${item.avatar}`, // Truyền ảnh danh mục
+                                        })
+
+                                }
                             />
                         ))}
                     </View>
