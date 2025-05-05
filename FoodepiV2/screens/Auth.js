@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ export default function AuthScreen({ route }) {
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
   const navigation = useNavigation();
 
+  // Countdown timer
   React.useEffect(() => {
     if (timer > 0) {
       const interval = setInterval(() => setTimer(t => t - 1), 1000);
@@ -26,19 +27,25 @@ export default function AuthScreen({ route }) {
     }
   }, [timer]);
 
+  // Trigger verification when OTP is fully entered
+  useEffect(() => {
+    const enteredOtp = otp.join('');
+    if (enteredOtp.length === 4) {
+      console.log('All OTP digits entered:', enteredOtp);
+      verifyOtpAndLogin();
+    }
+  }, [otp]);
+
   const handleChange = (text, idx) => {
     if (/^\d?$/.test(text)) {
       const newOtp = [...otp];
       newOtp[idx] = text;
       setOtp(newOtp);
 
+      console.log('Updated OTP:', newOtp.join(''));
+
       if (text && idx < 3) inputRefs[idx + 1].current.focus();
       if (!text && idx > 0) inputRefs[idx - 1].current.focus();
-
-      // Nếu đã nhập đủ 4 số, chuyển sang Home
-      if (newOtp.every(x => x.length === 1)) {
-        navigation.navigate('App');
-      }
     }
   };
 
@@ -48,9 +55,57 @@ export default function AuthScreen({ route }) {
     inputRefs[0].current.focus();
   };
 
+  const verifyOtpAndLogin = async () => {
+    const enteredOtp = otp.join('');
+    if (enteredOtp.length !== 4) {
+      alert('Vui lòng nhập mã OTP 4 chữ số hợp lệ.');
+      return;
+    }
+  
+    try {
+      // Kiểm tra người dùng hiện có
+      console.log('Fetching user with phone:', phoneNumber);
+      const res = await fetch(`https://681829955a4b07b9d1ce1539.mockapi.io/User?phone=${phoneNumber}`);
+      console.log('GET Response Status:', res.status);
+      const users = await res.json();
+      console.log('Fetched users:', users);
+  
+      let user;
+      if (Array.isArray(users) && users.length > 0) {
+        user = users[0];
+        console.log('Found user:', user);
+      } else {
+        // Tạo người dùng mới
+        console.log('No users found, creating new user...');
+        const createRes = await fetch(`https://681829955a4b07b9d1ce1539.mockapi.io/User`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone: phoneNumber,
+            firstname: 'New',
+            lastName: 'User',
+            email: '',
+            city: '',
+            avatar: 'https://i.pravatar.cc/150?u=' + phoneNumber,
+          }),
+        });
+        console.log('POST Response Status:', createRes.status);
+        if (!createRes.ok) {
+          console.error('POST Error:', await createRes.text());
+          throw new Error('Failed to create user');
+        }
+        user = await createRes.json();
+        console.log('Created user:', user);
+      }
+      navigation.navigate('App', { user });
+    } catch (err) {
+      console.error('Lỗi đăng nhập:', err);
+      alert('Có lỗi xảy ra. Vui lòng thử lại.');
+    }
+  };
+
   function maskPhone(phone) {
     if (!phone) return '';
-    // Giữ đầu +84 hoặc 0, che phần giữa, giữ 3 số cuối
     const visibleStart = phone.startsWith('+') ? 3 : 1;
     const start = phone.slice(0, visibleStart);
     const end = phone.slice(-3);
@@ -60,9 +115,9 @@ export default function AuthScreen({ route }) {
   return (
     <View style={styles.container}>
       <Image source={require('../assets/otp-logo.png')} style={styles.logo} />
-      <Text style={styles.title}>Help us verify your login</Text>
+      <Text style={styles.title}>Giúp chúng tôi xác minh đăng nhập của bạn</Text>
       <Text style={styles.desc}>
-        We have sent a verification code to the phone number registered in this account,please enter the code below :
+        Chúng tôi đã gửi mã xác minh đến số điện thoại đăng ký trong tài khoản này, vui lòng nhập mã dưới đây:
       </Text>
       <Text style={styles.phone}>{maskPhone(phoneNumber)}</Text>
       <View style={styles.otpRow}>
@@ -80,19 +135,18 @@ export default function AuthScreen({ route }) {
         ))}
       </View>
       <TouchableOpacity style={styles.resendBtn} disabled={timer > 0} onPress={handleResend}>
-        <Text style={styles.resendText}>
-          Send code again
-        </Text>
+        <Text style={styles.resendText}>Gửi lại mã</Text>
       </TouchableOpacity>
       <Text style={styles.timerText}>
-        Try again in <Text style={{ fontWeight: 'bold' }}>{timer} seconds</Text>
+        Thử lại sau <Text style={{ fontWeight: 'bold' }}>{timer} giây</Text>
       </Text>
-      <Text style={styles.notReceive}>Not receiving a message ?</Text>
-      <Text style={styles.callInstead}>Let us call you instead</Text>
+      <Text style={styles.notReceive}>Không nhận được tin nhắn?</Text>
+      <Text style={styles.callInstead}>Hãy để chúng tôi gọi cho bạn</Text>
     </View>
   );
 }
 
+// Styles giữ nguyên
 const styles = StyleSheet.create({
   container: {
     flex: 1,

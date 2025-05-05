@@ -3,15 +3,21 @@ import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawe
 import { View, Text, Image, StyleSheet } from 'react-native';
 
 export default function CustomDrawerContent(props) {
+  const { user } = props;
+  // Giá trị mặc định nếu user không tồn tại
+  const displayName = (user?.firstname || '') + ' ' + (user?.lastname || '') || 'New User';
+  const city = user?.city || 'Unknown City';
+  const avatar = user?.avatar || 'https://i.pravatar.cc/150'; // URL mặc định cho avatar
+
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.header}>
         <Image
-          source={require('../assets/circle-cropped.png')}
+          source={{ uri: avatar }}
           style={styles.avatar}
         />
-        <Text style={styles.name}>Rownok Mahbub</Text>
-        <Text style={styles.city}>Dhaka</Text>
+        <Text style={styles.name}>{displayName}</Text>
+        <Text style={styles.city}>{city}</Text>
       </View>
       <DrawerItemList {...props} />
     </DrawerContentScrollView>
