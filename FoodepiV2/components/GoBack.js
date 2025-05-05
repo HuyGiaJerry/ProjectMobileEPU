@@ -16,7 +16,7 @@ const ButtonGoBack = () => {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: "rgba(217, 239, 255, 1)",
-        borderRadius: 10,
+        borderRadius: "50%",
         padding: 8,
     },
 });

@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator, TouchableOpacity } from "react-native";
 import ButtonGoBack from "../components/GoBack"; // Import nút GoBack
-
+import { useNavigation } from "@react-navigation/native"; // Import navigation
+import { useTheme } from '../context/ThemeContext';
 const ShopByCate = ({ route }) => {
+    const { theme } = useTheme();
     const { categoryId, categoryName, categoryImage } = route.params; // Nhận dữ liệu từ HomeScreen
     const [shops, setShops] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigation = useNavigation(); // Sử dụng navigation
 
-    const defaultImage = "https://res.cloudinary.com/dvxny7v0f/image/upload/v1746430501/all-shop_fjlh7d.png";
+    const defaultImage = "https://res.cloudinary.com/dvxny7v0f/image/upload/v1746457610/all-shop_pdddle.png";
 
     useEffect(() => {
         // Gọi API để lấy dữ liệu shop theo categoryId
@@ -24,7 +27,10 @@ const ShopByCate = ({ route }) => {
     }, [categoryId]);
 
     const renderShop = ({ item }) => (
-        <View style={styles.shopCard}>
+        <TouchableOpacity
+            style={[styles.shopCard, { backgroundColor: theme.background }]} 
+            onPress={() => navigation.navigate("ShopDetail", { shopId: item.id })} // Chuyển hướng tới ShopDetail
+        >
             <View style={styles.imageContainer}>
                 <Image source={{ uri: `https://res.cloudinary.com/dvxny7v0f/image/upload/v1746420784/${item.avatar}` }} style={styles.shopImage} />
                 {item.discount && (
@@ -34,17 +40,17 @@ const ShopByCate = ({ route }) => {
                 )}
             </View>
             <View style={styles.shopInfo}>
-                <Text style={styles.shopName}>{item.name}</Text>
+                <Text style={[styles.shopName,{color: theme.text}]}>{item.name}</Text>
                 <Text style={styles.shopDetails}>
                     ⭐ {item.rating} ({item.review} reviews) • {item.away} m away
                 </Text>
                 <Text style={styles.shopDelivery}>Free ship</Text>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: theme.background }]}>
             {/* Nút Back */}
             <View style={styles.header}>
                 <ButtonGoBack />
@@ -52,7 +58,7 @@ const ShopByCate = ({ route }) => {
 
             {/* Nội dung */}
             <Image source={{ uri: categoryImage || defaultImage }} style={styles.headerImage} />
-            <Text style={styles.title}>{categoryName}</Text>
+            <Text style={[styles.title, { color: theme.text }]}>{categoryName}</Text>
             <Text style={styles.subtitle}>{shops.length} restaurants</Text>
             {loading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
@@ -71,7 +77,6 @@ const ShopByCate = ({ route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
     },
     header: {
         position: "absolute",
@@ -101,14 +106,11 @@ const styles = StyleSheet.create({
     },
     shopCard: {
         flexDirection: "row",
-        backgroundColor: "#f9f9f9",
         borderRadius: 10,
         marginBottom: 10,
         overflow: "hidden",
-        shadowColor: "#000",
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 3,
+        borderWidth: 1,
+        borderColor: "gray",
     },
     imageContainer: {
         position: "relative",
