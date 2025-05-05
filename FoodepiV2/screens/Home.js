@@ -127,7 +127,7 @@ const HomeScreen = ({ navigation }) => {
             padding: 10,
             marginBottom: 10,
             alignItems: 'center',
-            borderBlockColor: 'rgb(0, 0, 0)',
+            borderColor: '#ccc',
             borderWidth: 1,
         },
         categoryTitle: {
