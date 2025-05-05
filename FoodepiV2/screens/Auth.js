@@ -37,7 +37,7 @@ export default function AuthScreen({ route }) {
 
       // Nếu đã nhập đủ 4 số, chuyển sang Home
       if (newOtp.every(x => x.length === 1)) {
-        navigation.navigate('Home');
+        navigation.navigate('App');
       }
     }
   };
