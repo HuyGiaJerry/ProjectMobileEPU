@@ -35,27 +35,24 @@ export default function PaymentScreen({ navigation }) {
   ];
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
         <ButtonGoBack />
-        <Text style={styles.headerText}>Payment Methods</Text>
+        <Text style={[styles.headerText, { color: theme.text }]}>Payment Methods</Text>
       </View>
 
-      {/* Greeting */}
-      <Text style={styles.greeting}>
-        <Text style={styles.greetingBold}>Good Morning,</Text> Don't{'\n'}
-        Forget To Have <Text style={styles.greetingBold}>Breakfast</Text>
+      <Text style={[styles.greeting, { color: theme.text1 }]}>
+        <Text style={[styles.greetingBold, { color: theme.text }]}>Good Morning,</Text> Don't{'\n'}
+        Forget To Have <Text style={[styles.greetingBold, { color: theme.text }]}>Breakfast</Text>
       </Text>
 
-      {/* Balance Card */}
-      <View style={styles.balanceCard}>
+      <View style={[styles.balanceCard, { backgroundColor: theme.background1 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text style={styles.balanceLabel}>My Balance</Text>
+          <Text style={[styles.balanceLabel, { color: theme.text1 }]}>My Balance</Text>
           <Image source={require('../assets/Vector.png')} style={{ width: 20, height: 20 }} />
         </View>
-        <Text style={styles.totalBalance}>Total Balance</Text>
-        <Text style={styles.balanceValue}>${parseFloat(total).toFixed(2)}</Text>
+        <Text style={[styles.totalBalance, { color: theme.text1 }]}>Total Balance</Text>
+        <Text style={[styles.balanceValue, { color: theme.text }]}>${parseFloat(total).toFixed(2)}</Text>
 
         <View style={styles.balanceActions}>
           <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#2D2D2D' }]}>
@@ -67,15 +64,13 @@ export default function PaymentScreen({ navigation }) {
         </View>
       </View>
 
-      {/* Saved Cards */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Saved Cards</Text>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>Saved Cards</Text>
         <TouchableOpacity>
-          <Text style={styles.addCardText}>Add Cards</Text>
+          <Text style={[styles.addCardText, { color: theme.text1 }]}>Add Cards</Text>
         </TouchableOpacity>
       </View>
 
-      {/* FlatList rendering cards */}
       <FlatList
         data={cards}
         keyExtractor={(item) => item.id}
@@ -92,15 +87,15 @@ export default function PaymentScreen({ navigation }) {
           </View>
         )}
       />
-      {/* Other Payment Methods */}
+
       <View style={styles.paymentContainer}>
-        <TouchableOpacity style={styles.paymentOption}>
-          <Text style={styles.paymentOptionText}>Bank Transfer</Text>
+        <TouchableOpacity style={[styles.paymentOption, { backgroundColor: theme.background2 }]}>
+          <Text style={[styles.paymentOptionText, { color: theme.text }]}>Bank Transfer</Text>
           <Image source={require('../assets/arrow.png')} style={styles.paymentIcon} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.paymentOption}>
-          <Text style={styles.paymentOptionText}>Paypal</Text>
+        <TouchableOpacity style={[styles.paymentOption, { backgroundColor: theme.background2 }]}>
+          <Text style={[styles.paymentOptionText, { color: theme.text }]}>Paypal</Text>
           <Image source={require('../assets/arrow.png')} style={styles.paymentIcon} />
         </TouchableOpacity>
 
@@ -115,7 +110,6 @@ export default function PaymentScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
     paddingVertical: 40,
     paddingHorizontal: 20
   },
@@ -133,15 +127,12 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 16,
     marginBottom: 20,
-    color: '#888',
   },
   greetingBold: {
     fontWeight: 'bold',
-    color: '#000',
     fontSize: 22
   },
   balanceCard: {
-    backgroundColor: '#E5FFF3',
     padding: 16,
     borderRadius: 16,
     marginBottom: 24,
@@ -152,16 +143,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
     marginBottom: 4,
-    color: '#555',
   },
   totalBalance: {
     fontSize: 14,
-    color: '#888',
   },
   balanceValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#000',
     marginTop: 4,
   },
   balanceActions: {
@@ -189,7 +177,6 @@ const styles = StyleSheet.create({
   },
   addCardText: {
     fontSize: 14,
-    color: '#333',
   },
   card: {
     borderRadius: 16,
@@ -216,7 +203,6 @@ const styles = StyleSheet.create({
   paymentContainer: { marginTop: 16 },
   paymentOption: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
     alignItems: 'center',
     padding: 12,
     borderRadius: 12,
@@ -226,10 +212,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-  paymentIcon: { 
-    width: 24, 
-    height: 24, 
-    marginLeft: 8 
+  paymentIcon: {
+    width: 24,
+    height: 24,
+    marginLeft: 8
   },
   confirmBtn: {
     backgroundColor: '#A259FF',

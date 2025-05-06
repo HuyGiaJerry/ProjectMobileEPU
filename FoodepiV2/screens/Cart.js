@@ -25,6 +25,7 @@ export default function CartScreen({ navigation }) {
     setCart((prev) =>
       prev
         .map((item) =>
+          // copy properties của item 
           item.id === id ? { ...item, qty: item.qty + delta } : item
         )
         .filter((item) => item.qty > 0)
@@ -36,6 +37,7 @@ export default function CartScreen({ navigation }) {
     if (/^\d*$/.test(text)) {
       setCart((prev) =>
         prev.map((item) =>
+          // copy properties của item 
           item.id === id ? { ...item, qty: text } : item
         )
       );
@@ -50,6 +52,7 @@ export default function CartScreen({ navigation }) {
     } else {
       setCart((prev) =>
         prev.map((item) =>
+          // copy properties của item 
           item.id === id ? { ...item, qty: num } : item
         )
       );
@@ -84,7 +87,7 @@ export default function CartScreen({ navigation }) {
       textAlign: 'center',
     },
     cartItem: {
-      backgroundColor: theme.card || '#fafafa',
+      backgroundColor: theme.background || '#fafafa',
       borderRadius: 18,
       flexDirection: 'row',
       alignItems: 'center',
@@ -146,7 +149,7 @@ export default function CartScreen({ navigation }) {
     summary: {
       marginTop: 10,
       marginBottom: 18,
-      backgroundColor: theme.card || '#fafafa',
+      backgroundColor: theme.background1 || '#fafafa',
       borderRadius: 16,
       padding: 16,
       shadowColor: 'rgba(235, 82, 34, 0.1)',

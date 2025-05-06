@@ -14,21 +14,30 @@ import SettingScreen from '../screens/Setting';
 import TeamConditionScreen from '../screens/Team.Condition';
 import LogoutScreen from '../screens/Logout';
 import { Image } from 'react-native';
+import { useTheme } from '../context/ThemeContext';
 
 const Drawer = createDrawerNavigator();
 
 export default function AppDrawer({ route }) {
-  const { user } = route.params || {}; // Đảm bảo user không undefined
+  const { theme } = useTheme();
+  const { user } = route.params || {};
+
   return (
     <Drawer.Navigator
+      screenOptions={{
+        drawerStyle: {
+          backgroundColor: theme.background, // nền của drawer
+        },
+        drawerLabelStyle: {
+          fontWeight: '500',
+          color: theme.text, // màu chữ theo theme
+        },
+        headerShown: false,
+      }}
       drawerContent={(props) => <CustomDrawerContent {...props} user={user} />}
     >
-      <Drawer.Screen
-        name="Main"
-        component={MainStack}
-        options={{ headerShown: false }}
-        initialParams={{ user }}
-      />
+      <Drawer.Screen name="Main" component={MainStack} initialParams={{ user }} />
+
       <Drawer.Screen
         name="Profile"
         component={ProfileScreen}
@@ -40,8 +49,6 @@ export default function AppDrawer({ route }) {
               resizeMode="cover"
             />
           ),
-          drawerLabelStyle: { fontWeight: '500', color: 'rgba(0, 0, 0, 1)' },
-          headerShown: false,
         }}
         initialParams={{ user }}
       />
@@ -56,8 +63,6 @@ export default function AppDrawer({ route }) {
               resizeMode="cover"
             />
           ),
-          drawerLabelStyle: { fontWeight: '500', color: 'rgba(0, 0, 0, 1)' },
-          headerShown: false,
         }}
         initialParams={{ user }}
       />
@@ -72,8 +77,6 @@ export default function AppDrawer({ route }) {
               resizeMode="cover"
             />
           ),
-          drawerLabelStyle: { fontWeight: '500', color: 'rgba(0, 0, 0, 1)' },
-          headerShown: false,
         }}
         initialParams={{ user }}
       />
@@ -88,8 +91,6 @@ export default function AppDrawer({ route }) {
               resizeMode="cover"
             />
           ),
-          drawerLabelStyle: { fontWeight: '500', color: 'rgba(0, 0, 0, 1)' },
-          headerShown: false,
         }}
         initialParams={{ user }}
       />
@@ -104,8 +105,6 @@ export default function AppDrawer({ route }) {
               resizeMode="cover"
             />
           ),
-          drawerLabelStyle: { fontWeight: '500', color: 'rgba(0, 0, 0, 1)' },
-          headerShown: false,
         }}
         initialParams={{ user }}
       />
@@ -120,8 +119,6 @@ export default function AppDrawer({ route }) {
               resizeMode="cover"
             />
           ),
-          drawerLabelStyle: { fontWeight: '500', color: 'rgba(0, 0, 0, 1)' },
-          headerShown: false,
         }}
         initialParams={{ user }}
       />
@@ -136,42 +133,27 @@ export default function AppDrawer({ route }) {
               resizeMode="cover"
             />
           ),
-          drawerLabelStyle: { fontWeight: '500', color: 'rgba(0, 0, 0, 1)' },
-          headerShown: false,
         }}
         initialParams={{ user }}
       />
       <Drawer.Screen
         name="Help center"
         component={HelpScreen}
-        options={{
-          drawerLabelStyle: { fontWeight: '500', color: 'rgba(0, 0, 0, 1)' },
-        }}
         initialParams={{ user }}
       />
       <Drawer.Screen
         name="Settings"
         component={SettingScreen}
-        options={{
-          drawerLabelStyle: { fontWeight: '500', color: 'rgba(0, 0, 0, 1)' },
-        }}
         initialParams={{ user }}
       />
       <Drawer.Screen
         name="Terms & Condition/Privacy"
         component={TeamConditionScreen}
-        options={{
-          drawerLabelStyle: { fontWeight: '500', color: 'rgba(0, 0, 0, 1)' },
-        }}
         initialParams={{ user }}
       />
       <Drawer.Screen
         name="Logout"
         component={LogoutScreen}
-        options={{
-          drawerLabelStyle: { fontWeight: '500', color: 'rgba(0, 0, 0, 1)' },
-          headerShown: false,
-        }}
         initialParams={{ user }}
       />
     </Drawer.Navigator>
